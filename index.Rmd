@@ -1,6 +1,6 @@
 ---
 title: "Gov 50 Final Project"
-author: "Your Name Here"
+author: "John Kulow"
 description: "My final project"
 output:
   distill::distill_article:
@@ -11,4 +11,4 @@ output:
 
 ## Project thoughts
 
-I am interested in exploring data related to...
+I am interested in exploring data related to U.S. Elections. Specifically, I want to look into areas (hopefully on the precinct level), where there are high concentrations of immigrants and explore why certain areas vote more Liberal or Conservative or why certain areas have higher voter turnout. I would try my best to control for race/ethnicity, as I want to find non-race based reasons for these trends (ie. why Cambodian immigrants in Long Beach, CA might have different trends than Cambodian immigrants in Lowell, MA). Obviously, this is all dependent on what data I can find though!
