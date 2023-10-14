@@ -9,6 +9,8 @@ output:
 
 
 
-## Project thoughts
+## Project Proposal
 
-I am interested in exploring data related to U.S. Elections. Specifically, I want to look into areas (hopefully on the precinct level), where there are high concentrations of immigrants and explore why certain areas vote more Liberal or Conservative or why certain areas have higher voter turnout. I would try my best to control for race/ethnicity, as I want to find non-race based reasons for these trends (ie. why Cambodian immigrants in Long Beach, CA might have different trends than Cambodian immigrants in Lowell, MA). Obviously, this is all dependent on what data I can find though!
+Does diversity make a nation more vulnerable to civil war? I hypothesize that there will be a positive correlation between ethnic and religious fractionalization and a country's likelihood on average to experience a civil war. This is because in countries with ethnic and religious divisions politicians and other key players can serve as so-called ethnic entrepreneurs and can intentionally utilize ethnic or religious divisions in a country to rise to political power. As time goes on and these divisons become more politically salient, the more likely those divisions will turn violent.
+
+I plan to use the civil wars dataset, which includes data for over 50 years on whether countries experienced a civil war each year. The dataset also includes a number of measurements for ethnic and religious fractionalization, including two different methodologies for measuring ethnic fractionalization and data showing the proportion of the population that is part of the largest two ethnic groups and the largest two religious sects. I will use these measurements as my explanatory variables of interest. My outcome variable of interest will be the likelihood in any given year that a country is experiencing a civil war. If this average likelihood is higher in countries with higher ethnic and/or religious fractionalization than it is for countries with more homogenous populations, then this would prove my hypothesis. If this relationship is reversed or if there is no relationship at all, then my hypothesis will be proven false.
