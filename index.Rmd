@@ -1,7 +1,7 @@
 ---
 title: "Gov 50 Final Project"
 author: "John Kulow"
-description: "My final project"
+description: "My Final Project"
 output:
   distill::distill_article:
     self_contained: false
@@ -11,9 +11,9 @@ output:
 
 ## Project Proposal
 
-Does diversity make a nation more vulnerable to civil war? I hypothesize that there will be a positive correlation between ethnic and religious fractionalization and a country's likelihood on average to experience a civil war. This is because in countries with ethnic and religious divisions politicians and other key players can serve as so-called ethnic entrepreneurs and can intentionally utilize ethnic or religious divisions in a country to rise to political power. As time goes on and these divisons become more politically salient, the more likely those divisions will turn violent.
+Does diversity make a nation more vulnerable to civil war? Do ethnic divisions make civil wars last longer? I hypothesize that there will be a positive correlation between ethnic and religious fractionalization and the length of civil war. This is because in countries with ethnic and religious divisions politicians and other key players can serve as so-called ethnic entrepreneurs and can intentionally utilize ethnic or religious divisions in a country to rise to political power. As time goes on and these divisons become more politically salient, the more likely those divisions will turn violent. However, once society is divided, it becomes incredibly hard to unite the nation again.
 
-I plan to use the civil wars dataset, which includes data for over 50 years on whether countries experienced a civil war each year. The dataset also includes a number of measurements for ethnic and religious fractionalization, including two different methodologies for measuring ethnic fractionalization and data showing the proportion of the population that is part of the largest two ethnic groups and the largest two religious sects. I will use these measurements as my explanatory variables of interest. My outcome variable of interest will be the likelihood in any given year that a country is experiencing a civil war. If this average likelihood is higher in countries with higher ethnic and/or religious fractionalization than it is for countries with more homogenous populations, then this would prove my hypothesis. If this relationship is reversed or if there is no relationship at all, then my hypothesis will be proven false.
+I plan to use the civil wars dataset, which includes data for over 50 years on whether countries experienced a civil war each year. The dataset also includes a number of measurements for ethnic and religious fractionalization, including two different methodologies for measuring ethnic fractionalization and data showing the proportion of the population that is part of the largest two ethnic groups and the largest two religious sects. I will use these measurements as my explanatory variables of interest. My outcome variable of interest will be the average length of civil wars in countries that had them in the observed time period. If this average length is higher in countries with higher ethnic and/or religious fractionalization than it is for countries with more homogenous populations, then this would prove my hypothesis. If this relationship is reversed or if there is no relationship at all, then my hypothesis will be proven false.
 
 
 ## Data Visualization
@@ -25,6 +25,8 @@ civilwar <- read_csv("~/Downloads/civilwar.csv")
 
 ```{r, echo = FALSE}
 library(tidyverse)
+library(infer)
+library(modelsummary)
 ```
 
 
@@ -37,7 +39,8 @@ efs_cwar <- civilwar |>
             ef2 = mean(ef),
             prop_cwar = mean(war),
             firsteth = mean(plural),
-            secondeth = mean(second)) |>
+            secondeth = mean(second),
+            num_cwar = sum(onset)) |>
   mutate(cwar = if_else(prop_cwar > 0, 1, 0)) |>
   mutate(ef2 = case_when(
     cname == "VIETNAM," ~ 0.232737005,
@@ -50,11 +53,125 @@ efs_cwar <- civilwar |>
 
 
 ```{r, echo = FALSE}
+efs_cwar_years <- efs_cwar |>
+  filter(cwar == 1) |>
+  mutate(cwar_len = tot_cwar/num_cwar,
+         ef_perc = ef2 * 100)
+##efs_cwar_years
+```
+
+```{r, echo = FALSE}
+efs_cwar_years |>
+  ggplot(aes(x = cwar_len)) +
+  geom_histogram(binwidth = 1) +
+  labs(x = "Average Length of Civil Wars in Observed Countries (Years)",
+       y = "Density")
+```
+
+
+
+The distribution appears to be **right-skewed**, with a majority of countries having average civil war lengths of less than 15 years long.
+
+
+## Scatterplot Visualization
+
+
+```{r, echo = FALSE}
+splot_years <- efs_cwar_years |>
+  ggplot(mapping = aes(x = ef_perc, y = cwar_len)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Ethnic Fractionalization (%) (Fearon 2002 Methodology)", y = "Average Length of Observed Civil Wars (Years)", title = "Ethnic Fractionalization vs. Length of Civil War")
+splot_years
+```
+The above scatterplot shows the relationship between ethnic fractionalization and the average length of countries' civil wars in years. The relationship seems to be mostly flat, although there may be a slight positive correlation between the independent and dependent variables. The following regressions dive deeper into the analysis:
+
+## Primary Variable Regression
+
+The regression model below shows the relationship between ethnic fractionalization and average civil war length:
+
+```{r, echo = FALSE}
+fit <- lm(cwar_len ~ ef_perc, data = efs_cwar_years)
+fit
+
+modelsummary::modelsummary(
+  fit,
+  statistic = c("s.e. = {std.error}",
+                "p = {p.value}"),
+  gof_map = c("nobs", "r.squared", "adj.r.squared")
+)
+```
+
+This regression model shows that on average a 1% increase in ethnic fractionalization (as defined by the Fearon 2000 model) is associated with a **0.0306 year increase** in civil war length. The intercept coefficient indicates that a country that is 100% ethnically homogeneous would still be expected to have a civil war last 6.92 years on average. For statistical significance, the p-value of this relationship is about **0.432**. Unless an incredibly large alpha is used, this relationship is **not statistically significant**, and the null hypothesis cannot be rejected.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r, echo = FALSE}
+##cwar_years_quint_plot <- efs_cwar_years |>
+##  mutate(ef2quint = case_when(
+##    ef2 <= 0.1 ~ "0-10%",
+##    ef2 > 0.1 & ef2 <= 0.2 ~ "11-20%",
+##    ef2 > 0.2 & ef2 <= 0.3 ~ "21-30%",
+##    ef2 > 0.3 & ef2 <= 0.4 ~ "31-40%",
+##    ef2 > 0.4 & ef2 <= 0.5 ~ "41-50%",
+##    ef2 > 0.5 & ef2 <= 0.6 ~ "51-60%",
+##    ef2 > 0.6 & ef2 <= 0.7 ~ "61-70%",
+##    ef2 > 0.7 & ef2 <= 0.8 ~ "71-80%",
+##    ef2 > 0.8 & ef2 <= 0.9 ~ "81-90%",
+##    ef2 > 0.9 ~ "91-100%")) |>
+##  group_by(ef2quint) |>
+##  summarize(avg_cwar_len = mean(cwar_len),
+##            count = n())
+
+##cwar_years_quint_plot
+
+##ef2_cwar_quint_plot |>
+  ##ggplot(aes(x = ef2quint, y = avg_prop_cwar)) +
+  ##geom_col()
+```
+
+```{r, echo = FALSE}
+##cwar_years_quint_plot |>
+##  ggplot(aes(x = ef2quint, y = avg_cwar_len)) +
+##  geom_col() +
+##  labs(x = "Ethnic Fractionalization (Fearon 2002)", 
+##       y = "Average Length of Civil Wars in Countries (Years)",
+##       title = "Relationship Between Ethnic Fractionalization and Civil War Length")
+```
+
+
+
+```{r, echo = FALSE}
 ##efs_cwar |>
-  ##ggplot(mapping = aes(x = ef1, y = prop_cwar)) +
-  ##geom_point() +
-  ##geom_smooth() +
-  ##labs(x = "Ethnic Fractionalization (Soviet Atlas Methodology)", y = "Proportion of Observed Years Spent in Civil War", title = "Ethnic Fractionalization (Soviet Atlas) vs. Frequency of Civil War")
+ ## ggplot(mapping = aes(x = ef1, y = prop_cwar)) +
+ ## geom_point() +
+ ## geom_smooth() +
+ ## labs(x = "Ethnic Fractionalization (Soviet Atlas Methodology)", y = "Proportion of Observed Years Spent in Civil War", title = "Ethnic Fractionalization (Soviet Atlas) vs. Frequency of Civil War")
 ##lm(prop_cwar ~ ef1, data = efs_cwar)
 ```
 
@@ -115,22 +232,22 @@ efs_cwar <- civilwar |>
 ```
 
 ```{r, echo = FALSE}
-ef2_cwar_quint_plot <- efs_cwar |>
-  mutate(ef2quint = case_when(
-    ef2 <= 0.1 ~ "0-10%",
-    ef2 > 0.1 & ef2 <= 0.2 ~ "11-20%",
-    ef2 > 0.2 & ef2 <= 0.3 ~ "21-30%",
-    ef2 > 0.3 & ef2 <= 0.4 ~ "31-40%",
-    ef2 > 0.4 & ef2 <= 0.5 ~ "41-50%",
-    ef2 > 0.5 & ef2 <= 0.6 ~ "51-60%",
-    ef2 > 0.6 & ef2 <= 0.7 ~ "61-70%",
-    ef2 > 0.7 & ef2 <= 0.8 ~ "71-80%",
-    ef2 > 0.8 & ef2 <= 0.9 ~ "81-90%",
-    ef2 > 0.9 ~ "91-100%")) |>
-  group_by(ef2quint) |>
-  summarize(avg_prop_cwar = mean(prop_cwar),
-            quint_prop_cwar = mean(cwar),
-            count = n())
+##ef2_cwar_quint_plot <- efs_cwar |>
+##  mutate(ef2quint = case_when(
+##    ef2 <= 0.1 ~ "0-10%",
+##    ef2 > 0.1 & ef2 <= 0.2 ~ "11-20%",
+##    ef2 > 0.2 & ef2 <= 0.3 ~ "21-30%",
+##    ef2 > 0.3 & ef2 <= 0.4 ~ "31-40%",
+##    ef2 > 0.4 & ef2 <= 0.5 ~ "41-50%",
+##    ef2 > 0.5 & ef2 <= 0.6 ~ "51-60%",
+##    ef2 > 0.6 & ef2 <= 0.7 ~ "61-70%",
+##    ef2 > 0.7 & ef2 <= 0.8 ~ "71-80%",
+##    ef2 > 0.8 & ef2 <= 0.9 ~ "81-90%",
+##    ef2 > 0.9 ~ "91-100%")) |>
+ ## group_by(ef2quint) |>
+ ## summarize(avg_prop_cwar = mean(prop_cwar),
+ ##           quint_prop_cwar = mean(cwar),
+ ##           count = n())
 
 ##ef2_cwar_quint_plot
 
@@ -138,17 +255,16 @@ ef2_cwar_quint_plot <- efs_cwar |>
   ##ggplot(aes(x = ef2quint, y = avg_prop_cwar)) +
   ##geom_col()
 
-ef2_cwar_quint_plot |>
-  mutate(quint_prop_cwar = quint_prop_cwar * 100) |>
-  ggplot(aes(x = ef2quint, y = quint_prop_cwar)) +
-  geom_col() +
-  labs(x = "Ethnic Fractionalization (Fearon 2002)", 
-       y = "Proportion of Countries that Experienced a Civil War (%)",
-       title = "Relationship Between Ethnic Fractionalization and Civil War Likelihood")
+##ef2_cwar_quint_plot |>
+ ## mutate(quint_prop_cwar = quint_prop_cwar * 100) |>
+ ## ggplot(aes(x = ef2quint, y = quint_prop_cwar)) +
+ ## geom_col() +
+ ## labs(x = "Ethnic Fractionalization (Fearon 2002)", 
+ ##      y = "Proportion of Countries that Experienced a Civil War (%)",
+ ##      title = "Relationship Between Ethnic Fractionalization and Civil War Likelihood")
 
 ```
 
-The distribution appears to be **left-skewed**, with more ethnically diverse countries (those with higher ethnic fractionalization) being more likely to have had a civil war sometime during the ~50 year observed period.
 
 
 
@@ -156,9 +272,59 @@ The distribution appears to be **left-skewed**, with more ethnically diverse cou
 
 
 
+```{r, echo = FALSE}
+##efs_cwar <- efs_cwar |>
+ ## mutate(ef2quad = case_when(
+  ##  ef2 <= 0.25 ~ "0-25%",
+  ##  ef2 > 0.25 & ef2 <= 0.5 ~ "26-50%",
+  ##  ef2 > 0.5 & ef2 < 0.75 ~ "51-74%",
+  ##  ef2 >= 0.75 ~ "75-100%"))
+```
 
 
 
+```{r, echo = FALSE}
+##efs_cwar_ATE <- efs_cwar |>
+ ## group_by(ef2quad) |>
+ ## summarize(quad_prop_cwar = mean(cwar)) |>
+ ## pivot_wider(names_from = ef2quad,
+ ##             values_from = quad_prop_cwar) |>
+ ## select(`0-25%`, `75-100%`) |>
+ ## mutate(ATE = `75-100%` - `0-25%`) |>
+ ## select(ATE)
+##efs_cwar_ATE
+```
+
+
+```{r, echo = FALSE}
+##boot_efs_cwar <- efs_cwar |>
+ ## filter(ef2quad == "0-25%" | ef2quad == "75-100%") |>
+ ## rep_slice_sample(prop = 1, replace = TRUE, reps = 1000)|>
+ ## group_by(replicate, ef2quad) |>
+ ## summarize(quad_prop_cwar = mean(cwar)) |>
+ ## pivot_wider(names_from = ef2quad,
+ ##             values_from = quad_prop_cwar) |>
+##  select(`0-25%`, `75-100%`) |>
+##  mutate(ATE = `75-100%` - `0-25%`)
+##boot_efs_cwar
+```
+
+```{r, echo = FALSE}
+##boot_efs_cwar_ci <- quantile(boot_efs_cwar$ATE, probs = c(0.025, 0.975))
+##boot_efs_cwar_ci
+
+##boot_efs_cwar_p_value <- boot_efs_cwar |>
+ ## get_p_value(obs_stat = efs_cwar_ATE, direction = "both")
+##boot_efs_cwar_p_value
+```
+
+
+
+```{r, echo = FALSE}
+##boot_efs_cwar |>
+## visualize() +
+ ##shade_p_value(obs_stat = efs_cwar_ATE, direction = "both")
+```
 
 
 
