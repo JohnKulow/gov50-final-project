@@ -21,6 +21,7 @@ I plan to use the civil wars dataset, which includes data for over 50 years on w
 ```{r, echo = FALSE}
 library(readr)
 civilwar <- read_csv("~/Downloads/civilwar.csv")
+eth_data <- read_csv("~/Downloads/HIEF_data.csv")
 ```
 
 ```{r, echo = FALSE}
@@ -28,6 +29,196 @@ library(tidyverse)
 library(infer)
 library(modelsummary)
 ```
+
+```{r}
+eth_data <- eth_data |>
+  mutate(year = Year) |>
+  select(!Year)
+```
+
+```{r}
+civilwar |>
+  group_by(country) |>
+  summarize(num_cwar = sum(onset))
+```
+
+
+```{r}
+civilwar <- civilwar |>
+  mutate(Country = tolower(country)) |>
+  mutate(Country = case_when(
+    Country == "bosnia" ~ "bosnia-herzegovina",
+    Country == "central african rep." ~ "central african republic",
+    Country == "costarica" ~ "costa rica",
+    Country == "ivory coast" ~ "cote d'ivoire",
+    Country == "czechrep" ~ "czech republic",
+    Country == "dem. rep. congo" ~ "democratic republic of congo",
+    Country == "n. korea" ~ "democratic people's republic of korea",
+    Country == "vietnam" ~ "democratic republic of vietnam",
+    Country == "dominican rep." ~ "dominican republic",
+    Country == "german dem. rep." ~ "german democratic republic",
+    Country == "germanyfed. rep." ~ "german federal republic",
+    Country == "guinea bissau" ~ "guinea-bissau",
+    Country == "kyrgyzstan" ~ "kyrgyz republic",
+    Country == "korea, s." ~ "republic of korea",
+    Country == "vietnam, s." ~ "republic of vietnam",
+    Country == "trinidad & tobago" ~ "trinidad and tobago",
+    Country == "u. arab emirates" ~ "united arab emirates",
+    Country == "uk" ~ "united kingdom",
+    Country == "usa" ~ "united states of america",
+    Country == "yemen arab rep." ~ "yemen arab republic",
+    Country == "yemen" ~ "yemen arab republic",
+    Country == "yemen peop. rep." ~ "yemen pdr",
+    Country == "serbia" ~ "yugoslavia",
+    Country == "burma" ~ "myanmar",
+    TRUE ~ Country
+  ))
+```
+
+
+```{r}
+eth_data <- eth_data |>
+  mutate(Country = tolower(Country))
+```
+
+```{r}
+eth_data |>
+  group_by(Country, year) |>
+  summarize(n = n())
+
+civilwar |>
+  group_by(Country, year) |>
+  summarize(n = n())
+```
+
+
+```{r}
+joined_data <- left_join(civilwar, eth_data, by = join_by(Country, year))
+```
+
+```{r}
+joined_data |>
+  select(Country, country, EFindex, year)
+```
+
+
+```{r}
+joined_data |>
+  group_by(Country) |>
+  summarize(num_cwar = sum(onset, na.rm = TRUE))
+```
+
+
+
+
+```{r}
+slaydata <- joined_data |>
+  group_by(Country) |>
+  summarize(
+    num_cwar = sum(onset),
+    new_ef = mean(EFindex, na.rm = TRUE),
+    years_num = n(),
+    mts = mean(mtnest),
+    firsteth = mean(plural),
+    secondeth = mean(second),
+    gdppc = mean(gdpen),
+    ef1 = mean(ethfrac),
+    ef2 = mean(ef)
+  ) |>
+  mutate(ef2 = case_when(
+    Country == "yemen arab republic" | Country == "yemen pdr" ~ 0.078400016,
+    TRUE ~ ef2
+  )) |>
+  mutate(cwar = if_else(num_cwar > 0, 1, 0)) |>
+  mutate(eth_diff = firsteth - secondeth) |>
+  mutate(mean_efs = (ef1 + ef2 + new_ef) / 3) |>
+  drop_na(new_ef)
+```
+
+
+```{r}
+slaydata |>
+  group_by(num_cwar) |>
+  summarize(n = n()) |>
+  mutate(prop = n/sum(n))
+
+slaydata |>
+  ggplot(aes(x = num_cwar)) +
+  geom_bar() +
+  labs(x = "Number of Civil Wars", y = "Number of Countries")
+```
+
+```{r}
+slaydata |>
+  ggplot(mapping = aes(x = new_ef, y = num_cwar)) +
+  geom_point() +
+  geom_smooth()
+```
+
+```{r}
+fit_slay <- lm(num_cwar ~ new_ef, data = slaydata)
+
+
+modelsummary::modelsummary(
+  fit_slay,
+  statistic = c("s.e. = {std.error}",
+                "p = {p.value}"),
+  gof_map = c("nobs", "r.squared", "adj.r.squared")
+)
+
+## new_ef    .147 p
+## mts       .025 p
+## firsteth  .140 p
+## secondeth .996 p
+## eth_diff  .277 p
+## gdppc     <.001 p
+## ef1       .043 p
+## ef2       .057 p
+## mean_efs  .071 p
+
+fit_slay2 <- lm(num_cwar ~ mean_efs, data = slaydata)
+fit_slay2
+
+modelsummary::modelsummary(
+  fit_slay2,
+  statistic = c("s.e. = {std.error}",
+                "p = {p.value}"),
+  gof_map = c("nobs", "r.squared", "adj.r.squared")
+)
+
+fit_slay3 <- lm(num_cwar ~ mean_efs + secondeth, data = slaydata)
+fit_slay3
+
+modelsummary::modelsummary(
+  fit_slay3,
+  statistic = c("s.e. = {std.error}",
+                "p = {p.value}"),
+  gof_map = c("nobs", "r.squared", "adj.r.squared")
+)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```{r, echo = FALSE}
@@ -131,9 +322,68 @@ modelsummary::modelsummary(
 
 
 
+```{r}
+cwar_play <- civilwar |>
+  group_by(cname) |>
+  summarize(years_num = n(),
+            tot_cwar = sum(war),
+            ef1 = mean(ethfrac),
+            ef2 = mean(ef),
+            prop_cwar = mean(war),
+            firsteth = mean(plural),
+            secondeth = mean(second),
+            num_cwar = sum(onset),
+            gdppc = mean(gdpen * onset, na.rm = TRUE),
+            mts = mean(mtnest),
+            mean_onset = mean(onset)
+            ) |>
+  mutate(cwar = if_else(prop_cwar > 0, 1, 0)) |>
+  mutate(ef2 = case_when(
+    cname == "VIETNAM," ~ 0.232737005,
+    cname == "YEMEN AR" | cname == "YEMEN PE" ~ 0.078400016,
+    TRUE ~ ef2
+  )) |>
+  mutate(eth_diff = firsteth - secondeth)
+```
+
+```{r}
+cwar_play |>
+  ggplot(aes(x = num_cwar)) +
+  geom_bar() +
+  labs(x = "Number of Civil Wars", y = "Number of Countries")
+```
+
+```{r}
+cwar_play |>
+  group_by(num_cwar) |>
+  summarize(n = n()) |>
+  mutate(prop = n/sum(n))
+```
+
+
+```{r}
 
 
 
+
+cwar_play |>
+  ggplot(mapping = aes(x = ef2, y = num_cwar)) +
+  geom_point() +
+  geom_smooth()
+
+```
+
+```{r}
+fit_play <- lm(num_cwar ~ ef2 + years_num, data = cwar_play)
+fit_play
+
+modelsummary::modelsummary(
+  fit_play,
+  statistic = c("s.e. = {std.error}",
+                "p = {p.value}"),
+  gof_map = c("nobs", "r.squared", "adj.r.squared")
+)
+```
 
 
 
