@@ -40,7 +40,10 @@ efs_cwar <- civilwar |>
             prop_cwar = mean(war),
             firsteth = mean(plural),
             secondeth = mean(second),
-            num_cwar = sum(onset)) |>
+            num_cwar = sum(onset),
+            gdppc = mean(gdpen * onset, na.rm = TRUE),
+            mts = mean(mtnest),
+            ) |>
   mutate(cwar = if_else(prop_cwar > 0, 1, 0)) |>
   mutate(ef2 = case_when(
     cname == "VIETNAM," ~ 0.232737005,
@@ -106,7 +109,17 @@ This regression model shows that on average a 1% increase in ethnic fractionaliz
 
 
 
+```{r, echo = FALSE}
+fit2 <- lm(cwar_len ~ gdppc, data = efs_cwar_years)
+fit2
 
+modelsummary::modelsummary(
+  fit2,
+  statistic = c("s.e. = {std.error}",
+                "p = {p.value}"),
+  gof_map = c("nobs", "r.squared", "adj.r.squared")
+)
+```
 
 
 
