@@ -1519,10 +1519,12 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 
 <div class="d-article">
-<h2 id="project-proposal">Project Proposal</h2>
-<p>Does diversity make a nation more vulnerable to civil war? Do ethnic divisions make civil wars last longer? I hypothesize that there will be a positive correlation between ethnic and religious fractionalization and the length of civil war. This is because in countries with ethnic and religious divisions politicians and other key players can serve as so-called ethnic entrepreneurs and can intentionally utilize ethnic or religious divisions in a country to rise to political power. As time goes on and these divisons become more politically salient, the more likely those divisions will turn violent. However, once society is divided, it becomes incredibly hard to unite the nation again.</p>
-<p>I plan to use the civil wars dataset, which includes data for over 50 years on whether countries experienced a civil war each year. The dataset also includes a number of measurements for ethnic and religious fractionalization, including two different methodologies for measuring ethnic fractionalization and data showing the proportion of the population that is part of the largest two ethnic groups and the largest two religious sects. I will use these measurements as my explanatory variables of interest. My outcome variable of interest will be the average length of civil wars in countries that had them in the observed time period. If this average length is higher in countries with higher ethnic and/or religious fractionalization than it is for countries with more homogenous populations, then this would prove my hypothesis. If this relationship is reversed or if there is no relationship at all, then my hypothesis will be proven false.</p>
-<h2 id="data-visualization">Data Visualization</h2>
+<h2 id="introduction">Introduction</h2>
+<p>Does diversity make a nation more vulnerable to civil war? I hypothesize that there will be a positive correlation between ethnic fractionalization and a country’s likelihood on average to experience a civil war. This is because in countries with ethnic divisions, politicians and other key players can serve as so-called ethnic entrepreneurs and can intentionally utilize ethnic divisions in a country to rise to political power. As time goes on and these divisions become more politically salient, the more likely those divisions will turn violent.</p>
+<p>This question is incredibly important, as we live in times in which the benefits of diversity are routinely questioned while at the same time the internet and social media make it easier than ever to silo ourselves into environments dominated by people with similar backgrounds and beliefs.</p>
+<h2 id="data-research-design-and-dependent-variable">Data, Research Design, and Dependent Variable</h2>
+<p>For my data, I use a combination of two data sets. First, I use the Historical Index of Ethnic Fractionalization (HIEF), as compiled by Lenka Drazanova in 2019. This data set includes annual measures of ethnic fractionalization, which is the percent chance that any two residents of a certain country are from differing ethnic groups, for 162 countries over a 69 year period. The second data set I use is the “Civil Wars” data set provided by Professor Blackwell. This data set includes data over a 55-year period concerning which countries experienced civil wars, when they did, and for how long. This data set also includes two additional measures for ethnic fractionalization that use slightly different methodologies.</p>
+<p>I will use ethnic fractionalization as my explanatory variable of interest. My preliminary analysis of the data showed minimal difference between the three methodologies of measuring ethnic fractionalization, so for the purposes of my analysis I measure ethnic fractionalization by averaging the values of the three different methodologies to minimize the impact of potential outliers among the three sets of data. The following plot represents the distribution of this independent variable:</p>
 <div class="layout-chunk" data-layout="l-body">
 
 </div>
@@ -1536,24 +1538,39 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 </div>
 <div class="layout-chunk" data-layout="l-body">
-<p><img src="index_files/figure-html5/unnamed-chunk-5-1.png" width="624" /></p>
+
 </div>
-<p>The distribution appears to be <strong>right-skewed</strong>, with a majority of countries having average civil war lengths of less than 15 years long.</p>
-<h2 id="scatterplot-visualization">Scatterplot Visualization</h2>
 <div class="layout-chunk" data-layout="l-body">
-<p><img src="index_files/figure-html5/unnamed-chunk-6-1.png" width="624" /></p>
+
 </div>
-<p>The above scatterplot shows the relationship between ethnic fractionalization and the average length of countries’ civil wars in years. The relationship seems to be mostly flat, although there may be a slight positive correlation between the independent and dependent variables. The following regressions dive deeper into the analysis:</p>
-<h2 id="primary-variable-regression">Primary Variable Regression</h2>
-<p>The regression model below shows the relationship between ethnic fractionalization and average civil war length:</p>
+<div class="layout-chunk" data-layout="l-body">
+
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="index_files/figure-html5/unnamed-chunk-8-1.png" width="624" /></p>
+</div>
+<p>The distribution is slightly right-skewed given that very few countries are able to approach 100% ethnic fractionalization whereas it is far more common for countries, particularly small nations, to be overwhelmingly ethnically homogenous. However, the distribution is fairly uniform up until around the 80-90% ethnic fractionalization.</p>
+<p>Meanwhile, my outcome variable of interest, or dependent variable, will be the number of civil wars a country has had over the observed period. If this number is higher in countries with higher ethnic fractionalization than it is for countries with more homogenous populations, then this would prove my hypothesis. If this relationship is reversed or if there is no relationship at all, then my hypothesis will be proven false. Below is the distribution of how many civil wars the observed countries experienced over the relevant 55-year period:</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="index_files/figure-html5/unnamed-chunk-9-1.png" width="624" /></p>
+</div>
+<p>The distribution is <strong>right-skewed</strong>, with ~58% of countries having 0 civil wars during the observed period, ~25% having had only one, and the remaining ~17% having experienced more than one civil war.</p>
+<h2 id="results">Results</h2>
+<h1 id="scatterplot-visualization">Scatterplot Visualization</h1>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="index_files/figure-html5/unnamed-chunk-10-1.png" width="624" /></p>
+</div>
+<p>The above scatter plot shows the relationship between ethnic fractionalization (which, as previously mentioned, is measured by averaging the Fearon 2002, Soviet Atlas 1964, and HIEF methodologies) and the number of civil wars countries experienced over the observed 55-year period. There appears to be a notable positive correlation between the independent and dependent variables. The following regressions support this analysis:</p>
+<h1 id="primary-variable-regression">Primary Variable Regression</h1>
+<p>The regression model below shows the relationship between average ethnic fractionalization and number of civil wars:</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre><code>
 Call:
-lm(formula = cwar_len ~ ef_perc, data = efs_cwar_years)
+lm(formula = num_cwar ~ mean_efs_100, data = slaydata)
 
 Coefficients:
-(Intercept)      ef_perc  
-     6.9210       0.0306  </code></pre>
+ (Intercept)  mean_efs_100  
+    0.428864      0.006576  </code></pre>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1570,43 +1587,43 @@ Coefficients:
 (Intercept)
 </td>
 <td style="text-align:center;">
-6.921
+0.429
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 </td>
 <td style="text-align:center;">
-s.e. = 2.243
+s.e. = 0.181
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 </td>
 <td style="text-align:center;">
-p = 0.003
+p = 0.019
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-ef_perc
+mean_efs_100
 </td>
 <td style="text-align:center;">
-0.031
+0.007
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 </td>
 <td style="text-align:center;">
-s.e. = 0.039
+s.e. = 0.004
 </td>
 </tr>
 <tr>
 <td style="text-align:left;box-shadow: 0px 1.5px">
 </td>
 <td style="text-align:center;box-shadow: 0px 1.5px">
-p = 0.432
+p = 0.071
 </td>
 </tr>
 <tr>
@@ -1614,7 +1631,7 @@ p = 0.432
 Num.Obs.
 </td>
 <td style="text-align:center;">
-69
+154
 </td>
 </tr>
 <tr>
@@ -1622,7 +1639,7 @@ Num.Obs.
 R2
 </td>
 <td style="text-align:center;">
-0.009
+0.021
 </td>
 </tr>
 <tr>
@@ -1630,59 +1647,258 @@ R2
 R2 Adj.
 </td>
 <td style="text-align:center;">
-−0.006
+0.015
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>This regression model shows that on average a 1% increase in ethnic fractionalization (as defined by the Fearon 2000 model) is associated with a <strong>0.0306 year increase</strong> in civil war length. The intercept coefficient indicates that a country that is 100% ethnically homogeneous would still be expected to have a civil war last 6.92 years on average. For statistical significance, the p-value of this relationship is about <strong>0.432</strong>. Unless an incredibly large alpha is used, this relationship is <strong>not statistically significant</strong>, and the null hypothesis cannot be rejected.</p>
+<p>This regression model shows that, on average, a one percentage point increase in ethnic fractionalization is associated with an additional <strong>0.007 civil wars</strong> in the observed time period. The intercept coefficient indicates that a country that is 100% ethnically homogeneous (one with an ethnic fractionalization score of 0%) would be expected to have on average 0.429 civil wars over the 55-year time period. In terms of statistical significance, the p-value of this relationship is about <strong>0.071</strong>. Thus, at an alpha of 0.1 this relationship is <strong>statistically significant</strong>, and the null hypothesis can be rejected.</p>
+<p>This being said, because of possible confounding factors, the relationship between the two is not necessarily causal without further examination. Specifically, there are two possible confounding factors worthy of consideration: number of years observed and gdp per capita.</p>
+<h2 id="multivariable-regressions">Multivariable Regressions</h2>
+<h3 id="years-observed">Years Observed</h3>
+<p>While the Civil Wars data set examines 55 years (1945-1999), not every country included was independent for that entire period. In fact, only 58 of the 155 countries included in the data set have data for all 55 years. Thus, certain countries may simply have not had a chance to have a civil war yet at the rate we might expect. For example, Côte d’Ivoire gained independence in 1960 and thus only has data for 40 years in the data set. However, in 2002, three years after the last year observed in the data set, Côte d’Ivoire fell into its first civil war. Thus, without adequately controlling for years observed, we risk misinterpreting the data, especially since many of the countries that gained independence in the second half of the 1900’s were ethnically diverse former European colonies.</p>
+<p>The following multivariate regression shows the relationship between number of civil wars, ethnic fractionalization, and the number of years the country was observed:</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre><code>
+Call:
+lm(formula = num_cwar ~ mean_efs_100 + years_num, data = slaydata)
+
+Coefficients:
+ (Intercept)  mean_efs_100     years_num  
+   -0.342787      0.008959      0.016064  </code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:center;">
+ (1)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:center;">
+−0.343
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+s.e. = 0.324
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+p = 0.291
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean_efs_100
+</td>
+<td style="text-align:center;">
+0.009
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+s.e. = 0.004
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+p = 0.015
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+years_num
+</td>
+<td style="text-align:center;">
+0.016
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+s.e. = 0.006
+</td>
+</tr>
+<tr>
+<td style="text-align:left;box-shadow: 0px 1.5px">
+</td>
+<td style="text-align:center;box-shadow: 0px 1.5px">
+p = 0.005
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Num.Obs.
+</td>
+<td style="text-align:center;">
+154
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+R2
+</td>
+<td style="text-align:center;">
+0.071
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+R2 Adj.
+</td>
+<td style="text-align:center;">
+0.059
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>This regression shows that controlling for amount of years actually increases the intensity and certainty of the correlation between ethnic fractionalization and frequency of civil war. First, a one percentage point increase in ethnic fractionalization is now correlated with the country experiencing <strong>0.009 more civil wars</strong> over a 55-year time period, compared to just <strong>0.007</strong> when not controlling for years observed. Meanwhile, the p-value of this coefficient is just <strong>0.015</strong> compared to <strong>0.071</strong>. While the old value was still significant, controlling for years observed lowers the p-value to a level where it is statistically significant not only at an alpha of .1, but also at an alpha of .05 or of .025. Thus, this regression indicates that years observed was not a confounding factor and does not prove or disprove causality.</p>
+<h3 id="gdp-per-capita">GDP Per Capita</h3>
+<p>The second potential confounding factor is GDP per capita. Richer countries tend to be more stable and less civil war prone for a number of reasons. However, the richer countries on earth tend to be concentrated in Europe, North America, East Asia, and Oceania, all regions that tend to be much more ethnically homogenous than typically poorer regions like Africa, South Asia, and Southeast Asia. Thus, without controlling for GDP per capita, we cannot be certain about the causality of the relationship between ethnic fractionalization and civil war frequency.</p>
+<p>The below multivariate regression shows the relationship between civil war frequency, ethnic fractionalization, and GDP per capita:</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre><code>
+Call:
+lm(formula = num_cwar ~ mean_efs_100 + gdppc, data = slaydata)
+
+Coefficients:
+ (Intercept)  mean_efs_100         gdppc  
+    1.162275     -0.002128     -0.110471  </code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:center;">
+ (1)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:center;">
+1.162
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+s.e. = 0.342
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+p = &lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean_efs_100
+</td>
+<td style="text-align:center;">
+−0.002
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+s.e. = 0.005
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+p = 0.681
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gdppc
+</td>
+<td style="text-align:center;">
+−0.110
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+s.e. = 0.042
+</td>
+</tr>
+<tr>
+<td style="text-align:left;box-shadow: 0px 1.5px">
+</td>
+<td style="text-align:center;box-shadow: 0px 1.5px">
+p = 0.010
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Num.Obs.
+</td>
+<td style="text-align:center;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+R2
+</td>
+<td style="text-align:center;">
+0.071
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+R2 Adj.
+</td>
+<td style="text-align:center;">
+0.052
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>This regression shows that controlling for GDP per capita eliminates the statistically significant correlation between ethnic fractionalization and civil war frequency. Now, a one percentage point increase in ethnic fractionalization is actually correlated with <strong>0.002 fewer</strong> civil wars per 55 years. Furthermore, this slight negative relationship is not statistically significant, as the p-value for this relationship now that we control for GDP per capita is <strong>0.681</strong>, which is nowhere near statistical significance. This means that without further examination the relationship between ethnic fractionalization cannot be considered causal. This being said, the following caveat to this multivariate regression should be noted: GDP per capita data, which is part of the Civil War data set, is missing for about a third of the countries in the data set, and a number of those are authoritarian, closed off countries that have experienced more civil wars.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>This study has sought to investigate the relationship between a country’s ethnic diversity and how frequently it experiences civil wars. Through analysis of variables including ethnic fractionalization, number of civil wars, and GDP per capita, the findings support the hypothesis that more ethnically diverse countries tend to experience civil wars more frequently. This positive relationship was statistically significant at an alpha of 0.1 in the primary regression analysis, and was significant at an even more certain alpha of 0.025 in the multivariate regression analysis that controlled for the time frame countries were observed. However, the multivariate regression analysis looking at the impact of GDP per capita on the ethnic diversity-civil war frequency relationship showed that while there is an observable correlation generally, the correlation dissapears and loses statistical significance when controlling for a country’s wealth. Thus, this relationship cannot be considered causal without further analysis.</p>
+<p>Moreover, there are further limitations on this study. Most notably, as demographics change over time, so does ethnic fractionalization, but these demographic changes are not incorporated into the above analysis. This means that a country that began the observed time period as fairly homogeneous and had a civil war in the first few years but then became much more ethnically diverse shortly afterwards would appear in the data set to be an ethnically diverse country that experienced a civil war. Of the three measurements of ethnic fractionalization used, only the third (HIEF) tracked how ethnic fractionalization had changed over time, with the other two only having a singular measurement for each country as measured in the years those methodologies were made (2002 and 1964). Thus, both to simplify analysis and to standardize the measurement, I took the average of the HIEF data for each country before then taking the mean of that and the Fearon and Soviet Atlas methodologies’ scores. Thus, the ethnic fractionalization data is stagnant and hides demographic trends. This is a particular issue because, as the HIEF data shows, the average ethnic fractionalization score has increased by <strong>13.5 percentage points</strong>, going from <strong>32.1%</strong> in 1945 to <strong>45.7%</strong> in 2013.</p>
 <div class="layout-chunk" data-layout="l-body">
 
 </div>
+<p>For future analysis, a correction for this could be to do a year-by-year analysis that investigates which countries in any given year are experiencing a civil war and to see if more ethnically diverse countries in any given year experience civil wars at higher rates. This also could help correct for temporal changes in GDP per capita, as a country’s wealth changes over time and the GDP per capita data used in this study was a stagnant measurement taken in 2001, which not only is only a single year, but furthermore is a year that comes after the 1945-1999 time period that the civil war data concerns.</p>
 <div class="layout-chunk" data-layout="l-body">
 
 </div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
