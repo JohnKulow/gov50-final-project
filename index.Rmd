@@ -1,12 +1,11 @@
 ---
 title: "Gov 50 Final Project"
 author: "John Kulow"
-description: "My Final Project"
+description: "Ethnic Fractionalization and Civil War Frequency"
 output:
   distill::distill_article:
     self_contained: false
 ---
-
 
 
 ## Introduction
@@ -17,7 +16,7 @@ This question is incredibly important, as we live in times in which the benefits
 
 ## Data, Research Design, and Dependent Variable
 
-For my data, I use a combination of two data sets. First, I use the Historical Index of Ethnic Fractionalization (HIEF), as compiled by Lenka Drazanova in 2019. This data set includes annual measures of ethnic fractionalization, which is the percent chance that any two residents of a certain country are from differing ethnic groups, for 162 countries over a 69 year period. The second data set I use is the "Civil Wars" data set provided by Professor Blackwell. This data set includes data over a 55-year period concerning which countries experienced civil wars, when they did, and for how long. This data set also includes two additional measures for ethnic fractionalization that use slightly different methodologies.
+For my data, I use a combination of two data sets. First, I use the Historical Index of Ethnic Fractionalization (HIEF), as compiled by [Lenka Drazanova in 2019](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/4JQRCL). This data set includes annual measures of ethnic fractionalization, which is the percent chance that any two residents of a certain country are from differing ethnic groups, for 162 countries over a 69 year period. The second data set I use is the "Civil Wars" data set [provided by Professor Blackwell](https://www.dropbox.com/s/gde30hr9yokqku5/civilwar.csv?dl=0). This data set includes data over a 55-year period concerning which countries experienced civil wars, when they did, and for how long. This data set also includes two additional measures for ethnic fractionalization that use slightly different methodologies.
 
 I will use ethnic fractionalization as my explanatory variable of interest. My preliminary analysis of the data showed minimal difference between the three methodologies of measuring ethnic fractionalization, so for the purposes of my analysis I measure ethnic fractionalization by averaging the values of the three different methodologies to minimize the impact of potential outliers among the three sets of data. The following plot represents the distribution of this independent variable:
 
@@ -154,13 +153,14 @@ The regression model below shows the relationship between average ethnic fractio
 
 ```{r, echo = FALSE}
 fit_slay <- lm(num_cwar ~ mean_efs_100, data = slaydata)
-fit_slay
+
 
 modelsummary::modelsummary(
   fit_slay,
   statistic = c("s.e. = {std.error}",
                 "p = {p.value}"),
-  gof_map = c("nobs", "r.squared", "adj.r.squared")
+  gof_map = c("nobs", "r.squared", "adj.r.squared"),
+  title = "Primary Variable Regression"
 )
 
 ```
@@ -179,13 +179,14 @@ The following multivariate regression shows the relationship between number of c
 
 ```{r, echo = FALSE}
 fit_slay2 <- lm(num_cwar ~ mean_efs_100 + years_num, data = slaydata)
-fit_slay2
+
 
 modelsummary::modelsummary(
   fit_slay2,
   statistic = c("s.e. = {std.error}",
                 "p = {p.value}"),
-  gof_map = c("nobs", "r.squared", "adj.r.squared")
+  gof_map = c("nobs", "r.squared", "adj.r.squared"),
+  title = "Years Observed Multivariable Regression"
 )
 ```
 
@@ -200,13 +201,14 @@ The below multivariate regression shows the relationship between civil war frequ
 
 ```{r, echo = FALSE}
 fit_slay3 <- lm(num_cwar ~ mean_efs_100 + gdppc, data = slaydata)
-fit_slay3
+
 
 modelsummary::modelsummary(
   fit_slay3,
   statistic = c("s.e. = {std.error}",
                 "p = {p.value}"),
-  gof_map = c("nobs", "r.squared", "adj.r.squared")
+  gof_map = c("nobs", "r.squared", "adj.r.squared"),
+  title = "GDP Per Capita Multivariable Regression"
 )
 ```
 
