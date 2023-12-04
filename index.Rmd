@@ -133,6 +133,8 @@ slaydata |>
 
 The distribution is **right-skewed**, with ~58% of countries having 0 civil wars during the observed period, ~25% having had only one, and the remaining ~17% having experienced more than one civil war.
 
+This research design is a **cross-sectional observation study** since the data regarding these variables was collected simultaneously looking at each country's history. It is an observational study since the countries were not sorted into control and treatment groups beforehand - data about each country was simply recorded.
+
 ## Results
 
 # Scatterplot Visualization
